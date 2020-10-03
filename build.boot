@@ -13,7 +13,7 @@
 (bootlaces! +version+)
 
 (task-options!
- pom {:project 'BendixP/boot-midje
+ pom {:project 'bendixp/boot-midje
       :version +version+
       :description "Run midje tests in boot."
       :url "https://github.com/BendixP/boot-midje"
