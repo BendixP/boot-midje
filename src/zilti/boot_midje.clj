@@ -34,18 +34,25 @@
                 (if (seq filters)
                   (concat [:filter] (map read-string filters)))))))
 
+(defn init-pod-pool [config]
+  (pod/pod-pool (update-in (core/get-env) [:dependencies] into pod-deps) :init (partial init config)))
+
 (core/deftask midje
   "Run midje tests in boot."
   [n namespaces NAMESPACE #{sym} "symbols of the namespaces to run tests in."
    a autotest             bool   "Use Midje's built-in autotest."
    f filters    FILTER    #{str} "midje filters. Only facts matching one or more of the arguments are loaded."
    c config     CONFIG    #{str} "list of midje config files."
-   l level      LEVEL     int    "Set Midje's verbosity level."]
-  (let [worker-pods (pod/pod-pool (update-in (core/get-env) [:dependencies] into pod-deps) :init (partial init config))
+   l level      LEVEL     int    "Set Midje's verbosity level."
+   C ci-mode              bool   "fails ci-job if there are failures."]
+  (let [worker-pods (init-pod-pool config)
         t (delay (do-autotest worker-pods filters))]
     (core/cleanup (worker-pods :shutdown))
     (core/with-pre-wrap fileset
       (if autotest
         @t
-        (do-singletest worker-pods namespaces filters level))
+        (let [result (do-singletest worker-pods namespaces filters level)]
+          (if (and ci-mode (pos? (:failures result)))
+            (System/exit 1)
+            result)))
       fileset)))
