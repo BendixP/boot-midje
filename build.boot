@@ -1,8 +1,8 @@
 ;; -*- mode: Clojure; -*-
 (set-env!
  :source-paths #{"src"}
- :dependencies '[[org.clojure/clojure "1.10.1"     :scope "provided"]
-                 [boot/core           "2.0.0-rc1" :scope "provided"]
+ :dependencies '[[org.clojure/clojure "1.10.1"    :scope "provided"]
+                 [boot/core           "2.8.2"     :scope "provided"]
                  [adzerk/bootlaces    "0.2.0"     :scope "test"]])
 
 (require '[adzerk.bootlaces :refer :all]
